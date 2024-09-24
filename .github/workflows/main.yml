@@ -1,0 +1,32 @@
+on:
+  pull_request:
+    types: [closed]  # Trigger when a pull request is closed (merged)
+    branches:
+      - develop  # Only trigger when PRs are merged into the develop branch
+
+ 
+
+jobs:
+  create-pull-request:
+    if: github.event.pull_request.merged == true  # Only run if the PR was merged
+    runs-on: ubuntu-latest
+
+ 
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        ref: develop  # Check out the develop branch, since the PR was merged into it
+
+ 
+
+    - name: Create pull request to main
+      uses: peter-evans/create-pull-request@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        base: main  # Target branch for the PR (main)
+        branch: 'auto-merge/develop-to-main'  # Temporary branch name (create a new branch for this PR)
+        title: 'Auto PR: Merged develop into main'
+        body: 'Automated PR created after merging into develop.'
+        labels: 'automated-pr'
